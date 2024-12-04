@@ -37,6 +37,12 @@ namespace
             throw std::runtime_error("Enum out of range");
         }
     }
+
+    bool didPlayerWin(GameState gameState, Player player)
+    {
+        return ((gameState == GameState::WonByPlayerO && player == Player::O) ||
+                (gameState == GameState::WonByPlayerX && player == Player::X));
+    }
 }
 
 TicTacToeEngine::TicTacToeEngine(QObject *parent)
@@ -72,11 +78,8 @@ void TicTacToeEngine::registerMove(int cellId)
 
     if (isGameOver())
     {
-        if (m_gameState == GameState::WonByPlayerO && computerPlayer() == Player::O) {
-            m_computerWins++;
-        } else {
-            m_humanWins++;
-        }
+        if (didPlayerWin(m_gameState, computerPlayer())) m_computerWins++;
+        if (didPlayerWin(m_gameState, m_humanPlayer)) m_humanWins++;
 
         emit winsChanged();
 
@@ -99,8 +102,6 @@ bool TicTacToeEngine::isComputerTurn() const
 
 void TicTacToeEngine::processUserChoice(int cellId)
 {
-    qDebug() << "User pressed cell " << cellId;
-
     registerMove(cellId);
 
     if (!isGameOver())
@@ -132,8 +133,6 @@ void TicTacToeEngine::startComputerThread()
 
 void TicTacToeEngine::processComputerChoice(int cellId)
 {
-    qDebug() << "AI picked cell " << cellId;
-
     registerMove(cellId);
 }
 
