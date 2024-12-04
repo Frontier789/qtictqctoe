@@ -1,6 +1,9 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
+import tictactoe.utils 1.0
 
 Window {
     width: 640
@@ -9,6 +12,7 @@ Window {
     title: qsTr("QTicTacToe")
 
     Rectangle {
+        id: board_background
         anchors.fill: parent
         color: "lightblue"
 
@@ -23,12 +27,35 @@ Window {
                 model: 9
                 delegate: Button {
                     required property int index
-                    text: "Button " + (index + 1)
+                    text: textFromCellValue()
                     onClicked: ticTacToe.processUserChoice(index)
-                    Layout.fillWidth: true
+                    enabled: cellValue() == CellState.Empty
+
+                    Layout.preferredWidth: parent.width / 3
                     Layout.fillHeight: true
+
+                    function cellValue() {
+                        if (ticTacToe === null) {
+                            return CellState.Empty
+                        }
+
+                        return ticTacToe.cells[index]
+                    }
+
+                    function textFromCellValue() {
+                        switch (cellValue()) {
+                            case CellState.Empty: return "_";
+                            case CellState.FullX: return "X";
+                            case CellState.FullO: return "O";
+                        }
+                    }
                 }
             }
         }
+    }
+
+    Shortcut {
+        sequence: "Ctrl+R"
+        onActivated: ticTacToe.reset()
     }
 }

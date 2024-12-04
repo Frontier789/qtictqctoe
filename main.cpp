@@ -2,13 +2,22 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 
+#include "cellstate.h"
 #include "tictactoeengine.h"
 
 int main(int argc, char *argv[])
 {
-    QGuiApplication app(argc, argv);
+    qmlRegisterUncreatableMetaObject(
+        TicTacToeUtils::staticMetaObject,
+        "tictactoe.utils",
+        1, 0,
+        "CellState",
+        "Error: only enums"
+    );
 
-    QQmlApplicationEngine engine; 
+    QGuiApplication app(argc, argv);
+    QQmlApplicationEngine engine;
+
     TicTacToeEngine ticTacToe{&app};
     engine.rootContext()->setContextProperty("ticTacToe", &ticTacToe);
 
