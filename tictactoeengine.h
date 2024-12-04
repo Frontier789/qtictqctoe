@@ -5,16 +5,15 @@
 #include <QQmlEngine>
 
 #include "cellstate.h"
-#include "player.h"
+#include "gamestate.h"
 
 class TicTacToeEngine : public QObject
 {
-    using CellState = TicTacToeUtils::CellState;
-    using Player = TicTacToeUtils::Player;
-
     Q_OBJECT
-    Q_PROPERTY(QList<CellState> cells READ getCells NOTIFY cellsChanged);
-    Q_PROPERTY(bool isComputerTurn READ isComputerTurn NOTIFY computerTurnChanged);
+    Q_PROPERTY(QList<CellState> cells READ getCells NOTIFY gameStateChanged);
+    Q_PROPERTY(bool isComputerTurn READ isComputerTurn NOTIFY gameStateChanged);
+    Q_PROPERTY(bool isGameOver READ isGameOver NOTIFY gameStateChanged);
+    Q_PROPERTY(GameState gameState READ gameState NOTIFY gameStateChanged);
     QML_ELEMENT
 public:
     explicit TicTacToeEngine(QObject *parent = nullptr);
@@ -22,19 +21,19 @@ public:
     Q_INVOKABLE QList<CellState> getCells() const {return QList(m_cells.begin(), m_cells.end());}
     Q_INVOKABLE void processUserChoice(int cellId);
     Q_INVOKABLE void reset();
-    Q_INVOKABLE bool isComputerTurn() const {return m_computerTurn;}
+    Q_INVOKABLE bool isComputerTurn() const {return m_gameState == GameState::TurnOfPlayerO;}
+    Q_INVOKABLE bool isGameOver() const {return m_gameState == GameState::WonByPlayerO || m_gameState == GameState::WonByPlayerX || m_gameState == GameState::Draw;}
+    Q_INVOKABLE GameState gameState() const {return m_gameState;}
 
 signals:
-    void cellsChanged();
-    void computerTurnChanged();
+    void gameStateChanged();
 
 public slots:
     void processComputerChoice(int cellId);
 
 private:
     std::array<CellState, 9> m_cells;
-    Player m_nextPlayer;
-    bool m_computerTurn;
+    GameState m_gameState;
 
     void startComputerThread();
     void registerMove(int cellId);

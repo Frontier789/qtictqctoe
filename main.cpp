@@ -3,15 +3,24 @@
 #include <QQmlContext>
 
 #include "cellstate.h"
+#include "gamestate.h"
 #include "tictactoeengine.h"
 
 int main(int argc, char *argv[])
 {
     qmlRegisterUncreatableMetaObject(
-        TicTacToeUtils::staticMetaObject,
-        "tictactoe.utils",
+        CellStateNS::staticMetaObject,
+        "tictactoe.cellState",
         1, 0,
         "CellState",
+        "Error: only enums"
+    );
+
+    qmlRegisterUncreatableMetaObject(
+        GameStateNS::staticMetaObject,
+        "tictactoe.gameState",
+        1, 0,
+        "GameState",
         "Error: only enums"
     );
 

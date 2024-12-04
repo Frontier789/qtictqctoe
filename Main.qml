@@ -3,11 +3,14 @@ pragma ComponentBehavior: Bound
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
-import tictactoe.utils 1.0
+import tictactoe.cellState 1.0
+import tictactoe.gameState 1.0
 
 Window {
     width: 640
     height: 480
+    minimumWidth: 300
+    minimumHeight: 300
     visible: true
     title: qsTr("QTicTacToe")
 
@@ -16,11 +19,35 @@ Window {
         anchors.fill: parent
         color: "lightblue"
 
+        Text {
+            text: stateText()
+            color: "black"
+            font.pixelSize: 24
+
+            function stateText()
+            {
+                if (ticTacToe === null) {
+                    return "Exiting"
+                }
+
+                switch (ticTacToe.gameState) {
+                    case GameState.TurnOfPlayerO: return "Player O's turn.";
+                    case GameState.TurnOfPlayerX: return "Player X's turn.";
+                    case GameState.WonByPlayerO: return "Player O won!";
+                    case GameState.WonByPlayerX: return "Player X won!";
+                    case GameState.Draw: return "It's a draw!";
+                }
+            }
+
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+
         GridLayout {
             id: board_grid
             columns: 3
-            anchors.centerIn: parent
-            width: Math.min(parent.width, parent.height)
+            anchors.bottom: parent.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: Math.min(parent.width, parent.height - 50)
             height: width
 
             Repeater {
@@ -29,7 +56,7 @@ Window {
                     required property int index
                     text: textFromCellValue()
                     onClicked: ticTacToe.processUserChoice(index)
-                    enabled: cellValue() == CellState.Empty && !isComputerTurn()
+                    enabled: cellValue() == CellState.Empty && isPlayerTurn()
 
                     Layout.preferredWidth: parent.width / 3
                     Layout.fillHeight: true
@@ -42,12 +69,12 @@ Window {
                         return ticTacToe.cells[index]
                     }
 
-                    function isComputerTurn() {
+                    function isPlayerTurn() {
                         if (ticTacToe === null) {
-                            return true
+                            return false
                         }
 
-                        return ticTacToe.isComputerTurn
+                        return !ticTacToe.isComputerTurn && !ticTacToe.isGameOver
                     }
 
                     function textFromCellValue() {

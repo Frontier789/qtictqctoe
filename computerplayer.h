@@ -7,8 +7,6 @@
 
 class ComputerPlayer : public QThread
 {
-    using CellState = TicTacToeUtils::CellState;
-
     Q_OBJECT
     void run() override {
         const auto result = computeMove();

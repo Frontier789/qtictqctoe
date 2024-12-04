@@ -2,17 +2,16 @@
 
 #include "tictactoeengine.h"
 #include "computerplayer.h"
+#include "utils.h"
 
 namespace
 {
-    using namespace TicTacToeUtils;
-
-    CellState cellStateFromPlayer(Player player)
+    CellState cellStateFromGameState(GameState gameState)
     {
-        switch (player) {
-            case Player::X:
+        switch (gameState) {
+            case GameState::TurnOfPlayerX:
                 return CellState::FullX;
-            case Player::O:
+            case GameState::TurnOfPlayerO:
                 return CellState::FullO;
             default:
                 // Should never happen
@@ -20,13 +19,48 @@ namespace
         }
     }
 
-    Player rollNextPlayer(Player player)
+    bool isWinning(CellState c1,CellState c2,CellState c3)
     {
-        switch (player) {
-            case Player::X:
-                return Player::O;
-            case Player::O:
-                return Player::X;
+        if (c1 != c2 || c1 != c2 || c2 != c3) return false;
+
+        return c1 != CellState::Empty;
+    }
+
+    bool didSomeoneWin(const std::array<CellState, 9> &cells)
+    {
+        const auto board = Utils::unwrapBoard(cells);
+
+        for (int i=0;i<3;++i) {
+            if (isWinning(board[i][0], board[i][1], board[i][2])) return true;
+            if (isWinning(board[0][i], board[1][i], board[2][i])) return true;
+        }
+
+        if (isWinning(board[0][0], board[1][1], board[2][2])) return true;
+        if (isWinning(board[0][2], board[1][1], board[2][0])) return true;
+
+        return false;
+    }
+
+    bool isBoardFull(const std::array<CellState, 9> &cells)
+    {
+        for (const auto cell : cells) {
+            if (cell == CellState::Empty) return false;
+        }
+
+        return true;
+    }
+
+    GameState stateAfterMove(GameState gameState, bool won, bool over)
+    {
+        if (!won && over) return GameState::Draw;
+
+        switch (gameState) {
+            case GameState::TurnOfPlayerX:
+                if (won) return GameState::WonByPlayerX;
+                else return GameState::TurnOfPlayerO;
+            case GameState::TurnOfPlayerO:
+                if (won) return GameState::WonByPlayerO;
+                else return GameState::TurnOfPlayerX;
             default:
                 // Should never happen
                 throw std::runtime_error("Enum out of range");
@@ -42,13 +76,13 @@ TicTacToeEngine::TicTacToeEngine(QObject *parent)
 
 void TicTacToeEngine::registerMove(int cellId)
 {
-    m_cells[cellId] = cellStateFromPlayer(m_nextPlayer);
-    m_nextPlayer = rollNextPlayer(m_nextPlayer);
-    m_computerTurn = !m_computerTurn;
+    m_cells[cellId] = cellStateFromGameState(m_gameState);
+    const auto won = didSomeoneWin(m_cells);
+    const auto over = won || isBoardFull(m_cells);
 
-    emit computerTurnChanged();
-    emit cellsChanged();
+    m_gameState = stateAfterMove(m_gameState, won, over);
 
+    emit gameStateChanged();
 }
 
 void TicTacToeEngine::processUserChoice(int cellId)
@@ -56,17 +90,19 @@ void TicTacToeEngine::processUserChoice(int cellId)
     qDebug() << "User pressed cell " << cellId;
 
     registerMove(cellId);
-    startComputerThread();
+
+    if (m_gameState == GameState::TurnOfPlayerO)
+    {
+        startComputerThread();
+    }
 }
 
 void TicTacToeEngine::reset()
 {
     std::fill(m_cells.begin(), m_cells.end(), CellState::Empty);
-    m_nextPlayer = Player::X;
-    m_computerTurn = false;
+    m_gameState = GameState::TurnOfPlayerX;
 
-    emit computerTurnChanged();
-    emit cellsChanged();
+    emit gameStateChanged();
 }
 
 void TicTacToeEngine::startComputerThread()

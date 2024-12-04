@@ -4,7 +4,7 @@
 #include <QObject>
 #include <qqml.h>
 
-namespace TicTacToeUtils
+namespace CellStateNS
 {
     Q_NAMESPACE
 
@@ -16,5 +16,7 @@ namespace TicTacToeUtils
     };
     Q_ENUM_NS(CellState)
 }
+
+using CellStateNS::CellState;
 
 #endif // CELLSTATE_H
