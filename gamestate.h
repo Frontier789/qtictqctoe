@@ -10,6 +10,7 @@ namespace GameStateNS
 
     enum class GameState
     {
+        MainMenu,
         TurnOfPlayerO,
         TurnOfPlayerX,
         WonByPlayerO,

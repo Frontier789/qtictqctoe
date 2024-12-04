@@ -36,6 +36,7 @@ Window {
                     case GameState.WonByPlayerO: return "Player O won!";
                     case GameState.WonByPlayerX: return "Player X won!";
                     case GameState.Draw: return "It's a draw!";
+                    case GameState.MainMenu: return "Welcome to QTicTacToe!";
                 }
             }
 
@@ -49,6 +50,7 @@ Window {
             anchors.horizontalCenter: parent.horizontalCenter
             width: Math.min(parent.width, parent.height - 50)
             height: width
+            visible: ticTacToe !== null && !ticTacToe.isInMenu
 
             Repeater {
                 model: 9
@@ -85,6 +87,31 @@ Window {
                         }
                     }
                 }
+            }
+        }
+
+        GridLayout {
+            columns: 2
+            anchors.bottom: parent.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: Math.min(parent.width, parent.height - 50)
+            height: width
+            visible: ticTacToe !== null && ticTacToe.isInMenu
+
+            Button {
+                text: "Let the computer start"
+                onClicked: ticTacToe.startGame(true)
+
+                Layout.preferredWidth: parent.width / 2
+                Layout.fillHeight: true
+            }
+
+            Button {
+                text: "I would like to start"
+                onClicked: ticTacToe.startGame(false)
+
+                Layout.preferredWidth: parent.width / 2
+                Layout.fillHeight: true
             }
         }
     }

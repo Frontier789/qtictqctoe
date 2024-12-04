@@ -43,6 +43,19 @@ TicTacToeEngine::TicTacToeEngine(QObject *parent)
     reset();
 }
 
+void TicTacToeEngine::startGame(bool computerStarts)
+{
+    m_humanPlayer = computerStarts ? Player::O : Player::X;
+    m_gameState = GameState::TurnOfPlayerX;
+
+    emit gameStateChanged();
+
+    if (computerStarts)
+    {
+        startComputerThread();
+    }
+}
+
 void TicTacToeEngine::registerMove(int cellId)
 {
     m_cells[cellId] = cellStateFromGameState(m_gameState);
@@ -54,13 +67,26 @@ void TicTacToeEngine::registerMove(int cellId)
     emit gameStateChanged();
 }
 
+bool TicTacToeEngine::isComputerTurn() const
+{
+    switch (m_gameState)
+    {
+        case GameState::TurnOfPlayerX:
+            return computerPlayer() == Player::X;
+        case GameState::TurnOfPlayerO:
+            return computerPlayer() == Player::O;
+        default:
+            return false;
+    }
+}
+
 void TicTacToeEngine::processUserChoice(int cellId)
 {
     qDebug() << "User pressed cell " << cellId;
 
     registerMove(cellId);
 
-    if (m_gameState == GameState::TurnOfPlayerO)
+    if (!isGameOver())
     {
         startComputerThread();
     }
@@ -69,14 +95,19 @@ void TicTacToeEngine::processUserChoice(int cellId)
 void TicTacToeEngine::reset()
 {
     std::fill(m_cells.begin(), m_cells.end(), CellState::Empty);
-    m_gameState = GameState::TurnOfPlayerX;
+    m_gameState = GameState::MainMenu;
 
     emit gameStateChanged();
 }
 
+Player TicTacToeEngine::computerPlayer() const
+{
+    return Utils::nextPlayer(m_humanPlayer);
+}
+
 void TicTacToeEngine::startComputerThread()
 {
-    ComputerPlayer *workerThread = new ComputerPlayer(m_cells, Player::O, this);
+    ComputerPlayer *workerThread = new ComputerPlayer(m_cells, computerPlayer(), this);
     connect(workerThread, &ComputerPlayer::resultReady, this, &TicTacToeEngine::processComputerChoice);
     connect(workerThread, &ComputerPlayer::finished, workerThread, &QObject::deleteLater);
     workerThread->start();
