@@ -23,6 +23,7 @@ qt_add_qml_module(appqtictactoe
         SOURCES computerplayer.h computerplayer.cpp
         SOURCES gamestate.h
         SOURCES utils.h
+        SOURCES utils.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

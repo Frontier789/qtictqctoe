@@ -4,20 +4,15 @@
 #include <array>
 
 #include "cellstate.h"
+#include "player.h"
 
 namespace Utils
 {
-    inline std::array<std::array<CellState, 3>, 3> unwrapBoard(const std::array<CellState, 9> &board)
-    {
-        std::array<std::array<CellState, 3>, 3> unwrapped;
+    bool didSomeoneWin(const std::array<CellState, 9> &cells);
+    bool isBoardFull(const std::array<CellState, 9> &cells);
 
-        for (size_t i=0;i<9;++i)
-        {
-            unwrapped[i%3][i/3] = board[i];
-        }
-
-        return unwrapped;
-    }
+    CellState playerToCellState(Player player);
+    Player nextPlayer(Player player);
 }
 
 #endif // UTILS_H

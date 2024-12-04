@@ -4,6 +4,7 @@
 #include <QThread>
 
 #include "cellstate.h"
+#include "player.h"
 
 class ComputerPlayer : public QThread
 {
@@ -14,7 +15,7 @@ class ComputerPlayer : public QThread
     }
 
 public:
-    ComputerPlayer(const std::array<CellState, 9> &board, QObject *parent = nullptr);
+    ComputerPlayer(const std::array<CellState, 9> &board, Player me, QObject *parent = nullptr);
 
 signals:
     void resultReady(int cellId);
@@ -23,6 +24,7 @@ private:
     int computeMove();
 
     std::array<CellState, 9> m_cells;
+    Player m_player;
 };
 
 #endif // COMPUTERPLAYER_H
