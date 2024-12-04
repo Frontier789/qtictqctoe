@@ -1,6 +1,7 @@
 #include <algorithm>
 
 #include "tictactoeengine.h"
+#include "computerplayer.h"
 
 namespace
 {
@@ -39,20 +40,50 @@ TicTacToeEngine::TicTacToeEngine(QObject *parent)
     reset();
 }
 
+void TicTacToeEngine::registerMove(int cellId)
+{
+    m_cells[cellId] = cellStateFromPlayer(m_nextPlayer);
+    m_nextPlayer = rollNextPlayer(m_nextPlayer);
+    m_computerTurn = !m_computerTurn;
+
+    emit computerTurnChanged();
+    emit cellsChanged();
+
+}
+
 void TicTacToeEngine::processUserChoice(int cellId)
 {
     qDebug() << "User pressed cell " << cellId;
 
-    m_cells[cellId] = cellStateFromPlayer(m_nextPlayer);
-    m_nextPlayer = rollNextPlayer(m_nextPlayer);
-
-    emit cellsChanged();
+    registerMove(cellId);
+    startComputerThread();
 }
 
 void TicTacToeEngine::reset()
 {
     std::fill(m_cells.begin(), m_cells.end(), CellState::Empty);
     m_nextPlayer = Player::X;
+    m_computerTurn = false;
 
+    emit computerTurnChanged();
     emit cellsChanged();
 }
+
+void TicTacToeEngine::startComputerThread()
+{
+    ComputerPlayer *workerThread = new ComputerPlayer(m_cells, this);
+    connect(workerThread, &ComputerPlayer::resultReady, this, &TicTacToeEngine::processComputerChoice);
+    connect(workerThread, &ComputerPlayer::finished, workerThread, &QObject::deleteLater);
+    workerThread->start();
+}
+
+void TicTacToeEngine::processComputerChoice(int cellId)
+{
+    qDebug() << "AI picked cell " << cellId;
+
+    registerMove(cellId);
+}
+
+
+
+

@@ -29,7 +29,7 @@ Window {
                     required property int index
                     text: textFromCellValue()
                     onClicked: ticTacToe.processUserChoice(index)
-                    enabled: cellValue() == CellState.Empty
+                    enabled: cellValue() == CellState.Empty && !isComputerTurn()
 
                     Layout.preferredWidth: parent.width / 3
                     Layout.fillHeight: true
@@ -40,6 +40,14 @@ Window {
                         }
 
                         return ticTacToe.cells[index]
+                    }
+
+                    function isComputerTurn() {
+                        if (ticTacToe === null) {
+                            return true
+                        }
+
+                        return ticTacToe.isComputerTurn
                     }
 
                     function textFromCellValue() {
