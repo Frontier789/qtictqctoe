@@ -41,6 +41,8 @@ namespace
 
 TicTacToeEngine::TicTacToeEngine(QObject *parent)
     : QObject{parent}
+    , m_humanWins{0}
+    , m_computerWins{0}
 {
     restart();
 }
@@ -70,6 +72,14 @@ void TicTacToeEngine::registerMove(int cellId)
 
     if (isGameOver())
     {
+        if (m_gameState == GameState::WonByPlayerO && computerPlayer() == Player::O) {
+            m_computerWins++;
+        } else {
+            m_humanWins++;
+        }
+
+        emit winsChanged();
+
         QTimer::singleShot(std::chrono::milliseconds(1500), this, SLOT(restart()));
     }
 }

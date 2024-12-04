@@ -20,6 +20,40 @@ Window {
         color: "lightblue"
 
         Text {
+            text: winText()
+            color: "black"
+            font.pixelSize: 15
+            anchors.top: parent.top
+            anchors.left: parent.left
+
+            function winText()
+            {
+                if (ticTacToe === null) {
+                    return "Exiting"
+                }
+
+                return "Human: " + ticTacToe.humanWins
+            }
+        }
+
+        Text {
+            text: winText()
+            color: "black"
+            font.pixelSize: 15
+            anchors.top: parent.top
+            anchors.right: parent.right
+
+            function winText()
+            {
+                if (ticTacToe === null) {
+                    return "Exiting"
+                }
+
+                return "Computer: " + ticTacToe.computerWins
+            }
+        }
+
+        Text {
             text: stateText()
             color: "black"
             font.pixelSize: 24
@@ -116,8 +150,9 @@ Window {
         }
     }
 
-    Shortcut {
-        sequence: "Ctrl+R"
-        onActivated: ticTacToe.restart()
-    }
+    // NOTE: For debugging, not thread safe
+    // Shortcut {
+    //     sequence: "Ctrl+R"
+    //     onActivated: ticTacToe.restart()
+    // }
 }
