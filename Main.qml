@@ -93,6 +93,8 @@ Window {
                     text: textFromCellValue()
                     onClicked: ticTacToe.processUserChoice(index)
                     enabled: cellValue() == CellState.Empty && isPlayerTurn()
+                    font.pixelSize: 35
+                    palette.buttonText: colorFromCellValue()
 
                     Layout.preferredWidth: parent.width / 3
                     Layout.fillHeight: true
@@ -118,6 +120,14 @@ Window {
                             case CellState.Empty: return "_";
                             case CellState.FullX: return "X";
                             case CellState.FullO: return "O";
+                        }
+                    }
+
+                    function colorFromCellValue() {
+                        switch (cellValue()) {
+                            case CellState.Empty: return "black";
+                            case CellState.FullX: return "blue";
+                            case CellState.FullO: return "red";
                         }
                     }
                 }
