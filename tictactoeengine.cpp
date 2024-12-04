@@ -1,8 +1,10 @@
-#include <algorithm>
-
 #include "tictactoeengine.h"
 #include "computerplayer.h"
 #include "utils.h"
+
+#include <QTimer>
+
+#include <algorithm>
 
 namespace
 {
@@ -40,7 +42,7 @@ namespace
 TicTacToeEngine::TicTacToeEngine(QObject *parent)
     : QObject{parent}
 {
-    reset();
+    restart();
 }
 
 void TicTacToeEngine::startGame(bool computerStarts)
@@ -65,6 +67,11 @@ void TicTacToeEngine::registerMove(int cellId)
     m_gameState = stateAfterMove(m_gameState, won, over);
 
     emit gameStateChanged();
+
+    if (isGameOver())
+    {
+        QTimer::singleShot(std::chrono::milliseconds(1500), this, SLOT(restart()));
+    }
 }
 
 bool TicTacToeEngine::isComputerTurn() const
@@ -92,7 +99,7 @@ void TicTacToeEngine::processUserChoice(int cellId)
     }
 }
 
-void TicTacToeEngine::reset()
+void TicTacToeEngine::restart()
 {
     std::fill(m_cells.begin(), m_cells.end(), CellState::Empty);
     m_gameState = GameState::MainMenu;

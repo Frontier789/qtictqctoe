@@ -118,6 +118,6 @@ Window {
 
     Shortcut {
         sequence: "Ctrl+R"
-        onActivated: ticTacToe.reset()
+        onActivated: ticTacToe.restart()
     }
 }

@@ -22,7 +22,6 @@ public:
 
     Q_INVOKABLE QList<CellState> getCells() const {return QList(m_cells.begin(), m_cells.end());}
     Q_INVOKABLE void processUserChoice(int cellId);
-    Q_INVOKABLE void reset();
     Q_INVOKABLE bool isInMenu() const {return m_gameState == GameState::MainMenu;}
     Q_INVOKABLE bool isComputerTurn() const;
     Q_INVOKABLE bool isGameOver() const {return m_gameState == GameState::WonByPlayerO || m_gameState == GameState::WonByPlayerX || m_gameState == GameState::Draw;}
@@ -34,6 +33,7 @@ signals:
 
 public slots:
     void processComputerChoice(int cellId);
+    void restart();
 
 private:
     std::array<CellState, 9> m_cells;
